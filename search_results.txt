@@ -1,0 +1,2 @@
+C:\Documents\notes.txt
+C:\Documents\subfolder\todo.txt

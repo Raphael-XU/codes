@@ -1,0 +1,106 @@
+import java.util.*;
+
+class Film {
+    String name;
+    String category;
+    int duration;
+
+    public Film(String name, String category, int duration) {
+        this.name = name;
+        this.category = category;
+        this.duration = duration;
+    }
+}
+
+class Viewer {
+    String username;
+    List<Film> viewingHistory;
+    Map<String, Integer> categoryWatchTime;
+
+    public Viewer(String username) {
+        this.username = username;
+        this.viewingHistory = new ArrayList<>();
+        this.categoryWatchTime = new HashMap<>();
+    }
+
+    public void watchFilm(Film film) {
+        viewingHistory.add(film);
+        categoryWatchTime.put(film.category, categoryWatchTime.getOrDefault(film.category, 0) + film.duration);
+    }
+
+    public void showViewingHistory() {
+        System.out.println("Viewing History for " + username + ":");
+        for (Film film : viewingHistory) {
+            System.out.println("- " + film.name + " (" + film.category + ", " + film.duration + " mins)");
+        }
+    }
+
+    public void recommendFilm(List<Film> films) {
+        if (categoryWatchTime.isEmpty()) {
+            System.out.println("No viewing history found. Please watch some films first.");
+            return;
+        }
+
+        String favoriteCategory = Collections.max(categoryWatchTime.entrySet(), Map.Entry.comparingByValue()).getKey();
+        System.out.println("Recommended films in your favorite category (" + favoriteCategory + "):");
+        for (Film film : films) {
+            if (film.category.equals(favoriteCategory) && !viewingHistory.contains(film)) {
+                System.out.println("- " + film.name);
+            }
+        }
+    }
+}
+
+public class SedayonCLI {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Film> filmCatalog = Arrays.asList(
+            new Film("Inception", "Sci-Fi", 148),
+            new Film("The Matrix", "Sci-Fi", 136),
+            new Film("Titanic", "Romance", 195),
+            new Film("The Notebook", "Romance", 123),
+            new Film("Avengers: Endgame", "Action", 181),
+            new Film("John Wick", "Action", 101)
+        );
+
+        System.out.print("Enter your username: ");
+        String username = scanner.nextLine();
+        Viewer viewer = new Viewer(username);
+
+        while (true) {
+            System.out.println("\n1. Watch a Film\n2. Show Viewing History\n3. Get Film Recommendations\n4. Exit");
+            System.out.print("Choose an option: ");
+            int option = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (option) {
+                case 1:
+                    System.out.println("Available Films:");
+                    for (int i = 0; i < filmCatalog.size(); i++) {
+                        System.out.println((i + 1) + ". " + filmCatalog.get(i).name + " (" + filmCatalog.get(i).category + ")");
+                    }
+                    System.out.print("Enter the number of the film to watch: ");
+                    int filmIndex = scanner.nextInt() - 1;
+                    if (filmIndex >= 0 && filmIndex < filmCatalog.size()) {
+                        viewer.watchFilm(filmCatalog.get(filmIndex));
+                        System.out.println("You watched " + filmCatalog.get(filmIndex).name);
+                    } else {
+                        System.out.println("Invalid choice.");
+                    }
+                    break;
+                case 2:
+                    viewer.showViewingHistory();
+                    break;
+                case 3:
+                    viewer.recommendFilm(filmCatalog);
+                    break;
+                case 4:
+                    System.out.println("Exiting Sedayon CLI. Goodbye!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
